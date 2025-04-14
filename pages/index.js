@@ -1,115 +1,166 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { useSession, signIn, signOut } from "next-auth/react";
+import { useState } from "react";
 
 export default function Home() {
+  const { data: session } = useSession();
+  const [instantMeetLink, setInstantMeetLink] = useState(null);
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("");
+  const [scheduledLink, setScheduledLink] = useState(null);
+
+  const generateMeetLink = () =>
+    `https://meet.google.com/${Array.from({ length: 3 }, () =>
+      Math.random().toString(36).substring(2, 5)
+    ).join("-")}`;
+
+  const createInstantMeet = () => setInstantMeetLink(generateMeetLink());
+
+  const scheduleMeeting = () => {
+    if (!scheduledDate || !scheduledTime) {
+      alert("Please select both date and time.");
+      return;
+    }
+    setScheduledLink({
+      link: generateMeetLink(),
+      time: `${scheduledDate} at ${scheduledTime}`,
+    });
+  };
+
+  // const scheduleMeeting = async () => {
+  //   if (!scheduledDate || !scheduledTime) {
+  //     alert("Please select both date and time.");
+  //     return;
+  //   }
+
+  //   try {
+  //     const res = await fetch("/api/create-event", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         date: scheduledDate,
+  //         time: scheduledTime,
+  //       }),
+  //     });
+
+  //     const data = await res.json();
+
+  //     if (res.ok) {
+  //       setScheduledLink({
+  //         link: data.event.htmlLink,
+  //         time: `${scheduledDate} at ${scheduledTime}`,
+  //       });
+  //     } else {
+  //       alert("Failed to create event.");
+  //       console.error(data.error);
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert("Something went wrong.");
+  //   }
+  // };
+
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              pages/index.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="max-w-xl w-full bg-white shadow-lg rounded-2xl p-8 space-y-8">
+        <h1 className="text-2xl font-bold text-center text-gray-800">
+          Google Meet Scheduler
+        </h1>
+
+        {session ? (
+          <>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-600">
+                Welcome, {session.user.name}
+              </p>
+              <button
+                onClick={() => signOut()}
+                className="bg-red-500 text-white px-4 py-2 text-sm rounded hover:bg-red-600 transition"
+              >
+                Sign out
+              </button>
+            </div>
+
+            {/* Instant Meeting Section */}
+            <div>
+              <h2 className="text-lg font-semibold text-gray-700 mb-2">
+                Instant Meeting
+              </h2>
+              <button
+                onClick={createInstantMeet}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+              >
+                Create Now
+              </button>
+              {instantMeetLink && (
+                <p className="mt-2 text-blue-700 text-sm break-all">
+                  <a
+                    href={instantMeetLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                  >
+                    {instantMeetLink}
+                  </a>
+                </p>
+              )}
+            </div>
+
+            {/* Scheduled Meeting Section */}
+            <div>
+              <h2 className="text-lg font-semibold text-gray-700 mb-2 mt-6">
+                Schedule Meeting
+              </h2>
+              <div className="flex gap-2 mb-2">
+                <input
+                  type="date"
+                  value={scheduledDate}
+                  onChange={(e) => setScheduledDate(e.target.value)}
+                  className="border rounded px-2 py-1 w-full"
+                />
+                <input
+                  type="time"
+                  value={scheduledTime}
+                  onChange={(e) => setScheduledTime(e.target.value)}
+                  className="border rounded px-2 py-1 w-full"
+                />
+              </div>
+              <button
+                onClick={scheduleMeeting}
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+              >
+                Schedule
+              </button>
+              {scheduledLink && (
+                <p className="mt-2 text-green-700 text-sm break-all">
+                  Meeting on {scheduledLink.time}:{" "}
+                  <a
+                    href={scheduledLink.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                  >
+                    {scheduledLink.link}
+                  </a>
+                </p>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="text-center">
+            <p className="mb-4 text-sm text-gray-600">
+              Sign in to create meetings
+            </p>
+            <button
+              onClick={() => signIn("google")}
+              className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
+            >
+              Sign in with Google
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
